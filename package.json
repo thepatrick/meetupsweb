@@ -2,7 +2,8 @@
   "name": "meetupsweb",
   "version": "0.0.0",
   "scripts": {
-    "start": "node server.js"
+    "database:reset": "node --experimental-modules resetDatabase.js",
+    "start": "node --experimental-modules server.js"
   },
   "private": true,
   "dependencies": {
