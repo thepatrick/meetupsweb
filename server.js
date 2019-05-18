@@ -2,25 +2,26 @@ const keystone = require('@keystone-alpha/core')
 const path = require('path')
 const PORT = process.env.PORT || 3000
 
-// Keystone will prepare the Admin UI (if configured in index.js) and GraphQL
-// APIs here.
-keystone
-  .prepare({
-    entryFile: 'index.js',
-    port: PORT
-  })
-  // 'server' is an express instance, to which you can attach your own routes,
-  // middlewares, etc.
-  .then(async ({ server, keystone: keystoneApp }) => {
-    await keystoneApp.connect()
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/meetupsweb'
 
-    // In this project, we attach a single route handler for `/public` to serve
-    // our app
-    server.app.use(server.express.static(path.join(__dirname, 'public')))
-    // Finally, we must start the server so we can access the Admin UI and
-    // GraphQL API
-    return server.start()
-  })
+async function main () {
+  const { server, keystone: keystoneApp } = await keystone.prepare({ port: PORT })
+  await keystoneApp.connect(mongoUri)
+
+  const users = await keystoneApp.lists.User.adapter.findAll()
+  if (!users.length) {
+    throw new Error('You have no users, you probably meant to run `yarn database:reset` first')
+  }
+
+  // In this project, we attach a single route handler for `/public` to serve
+  // our app
+  server.app.use(server.express.static(path.join(__dirname, 'public')))
+  // Finally, we must start the server so we can access the Admin UI and
+  // GraphQL API
+  return server.start()
+}
+
+main()
   .catch(error => {
     console.error(error)
     process.exit(1)
