@@ -101,6 +101,18 @@ exports.Talk = {
   access: access.readWriteLoggedIn,
   fields: {
     name: { type: Text, schemaDoc: 'Title of this talk' },
-    event: { type: Relationship, ref: 'Event.talks', isRequired: true }
+    event: { type: Relationship, ref: 'Event.talks', isRequired: true },
+    encodeProfile: {
+      type: Select,
+      options: ['hdv_720_25p', 'atsc_1080p_25'],
+      defaultValue: 'atsc_1080p_25',
+      schemaDoc: 'What profile should we encode this talk with (typically you want 1080p)'
+    },
+    encodeFps: {
+      type: Select,
+      options: 'fps25, fps30, fps50, fps60',
+      defaultValue: 'fps25',
+      schemaDoc: 'What FPS was this talk recorded at (typically 25 in PAL countries, 30 in NTSC countries)'
+    }
   }
 }
