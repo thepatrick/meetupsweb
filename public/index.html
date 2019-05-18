@@ -31,6 +31,7 @@
 
       function graphql(query, variables = {}) {
         return fetch('/admin/api', {
+          withCredentials: true,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -42,77 +43,18 @@
         }).then(x => x.json());
       }
 
-      const GET_TODOS = `
-        query GetTodos {
-          allTodos {
+      const GET_TALKS = `
+        query GetTalks {
+          allTalks {
             name
             id
           }
         }
       `;
-
-      const ADD_TODO = `
-        mutation AddTodo($name: String!) {
-          createTodo(data: { name: $name }) {
-            name
-            id
-          }
-        }
-      `;
-
-      const REMOVE_TODO = `
-        mutation RemoveTodo($id: ID!) {
-          deleteTodo(id: $id) {
-            name
-            id
-          }
-        }
-      `;
-
-      const Form = ({ refetch }) => {
-        let [value, setValue] = useState('');
-
-        return (
-          <div>
-            <form
-              onSubmit={e => {
-                e.preventDefault();
-                graphql(ADD_TODO, { name: value }).then(refetch);
-                setValue('');
-              }}
-            >
-              <input
-                placeholder="Add new item"
-                style={styles.formInput}
-                className="addItem"
-                value={value}
-                onChange={event => {
-                  setValue(event.target.value);
-                }}
-              />
-            </form>
-          </div>
-        );
-      };
 
       const Item = props => (
         <li style={styles.listItem}>
-          {props.todo.name}
-          <button
-            style={styles.deleteButton}
-            className="trash"
-            onClick={() => {
-              graphql(REMOVE_TODO, { id: props.todo.id }).then(props.refetch);
-            }}
-          >
-            <svg viewBox="0 0 14 16" style={styles.deleteIcon}>
-              <title>Delete this item</title>
-              <path
-                fillRule="evenodd"
-                d="M11 2H9c0-.55-.45-1-1-1H5c-.55 0-1 .45-1 1H2c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1v9c0 .55.45 1 1 1h7c.55 0 1-.45 1-1V5c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1zm-1 12H3V5h1v8h1V5h1v8h1V5h1v8h1V5h1v9zm1-10H2V3h9v1z"
-              />
-            </svg>
-          </button>
+          {props.talk.name}
         </li>
       );
 
@@ -127,9 +69,9 @@
           case 'loaded': {
             return (
               <ul style={{ listStyle: 'none', padding: 0 }}>
-                {data.allTodos.map((todo, index) => (
-                  <Item todo={todo} refetch={refetch} key={index} />
-                ))}
+                {data.allTalks && data.allTalks.map((talk, index) => (
+                  <Item talk={talk} refetch={refetch} key={index} />
+                )) || <div>You probably need to login 🧐</div>}
               </ul>
             );
           }
@@ -139,7 +81,7 @@
       const App = () => {
         let [{ state, data }, setState] = useState({ state: 'loading', data: null });
         let fetch = () => {
-          graphql(GET_TODOS)
+          graphql(GET_TALKS)
             .then(({ data }) => {
               setState({ state: 'loaded', data });
             })
@@ -152,15 +94,13 @@
 
         return (
           <div style={styles.app}>
-            <h1 style={styles.mainHeading}>Welcome to Keystone 5!</h1>
+            <h1 style={styles.mainHeading}>Welcome to meetupsweb!</h1>
             <p style={styles.introText}>
-              Here's a simple demo app that lets you add/remove todo items. Create a few entries,
-              then go check them out from your <a href="/admin">Keystone 5 Admin UI</a>!
+              Go to the <a href="/admin">Keystone 5 Admin UI</a>.
             </p>
             <hr style={styles.divider} />
             <div style={styles.formWrapper}>
-              <h2 style={styles.appHeading}>To-Do List</h2>
-              <Form refetch={fetch} />
+              <h2 style={styles.appHeading}>Current Talk List</h2>
               <List data={data} state={state} refetch={fetch} />
             </div>
           </div>
