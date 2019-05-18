@@ -1,0 +1,18 @@
+{
+  "name": "meetupsweb",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "private": true,
+  "dependencies": {
+    "@keystone-alpha/adapter-mongoose": "latest",
+    "@keystone-alpha/admin-ui": "latest",
+    "@keystone-alpha/core": "latest",
+    "@keystone-alpha/fields": "latest",
+    "@keystone-alpha/keystone": "latest"
+  },
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}
